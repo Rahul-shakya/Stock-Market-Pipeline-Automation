@@ -4,8 +4,7 @@ from datetime import datetime
 from airflow.sensors.base import PokeReturnValue
 from airflow.operators.python import PythonOperator
 import requests
-
-from include.stock_market.tasks import _get_stock_prices
+from include.stock_market.tasks import _get_stock_prices, _store_prices
 
 SYMBOL = 'APPL'
 
@@ -36,10 +35,19 @@ def stock_market():
         op_kwargs = {'url' : '{{ task_instance.xcom_pull(task_ids = "is_api_available") }}', 'symbol' : SYMBOL}
     )
 
+    store_prices = PythonOperator(
+        task_id = 'store_prices',
+        python_callable = _store_prices,
+        op_kwargs = {'stock' : '{{ task_instance.xcom_pull(task_ids = "get_stock_prices") }}', 'symbol' : SYMBOL}
+
+    )
+
+
+
     # when we use decorators, we need to call the fx explicitly,
     # like we did for is_api_available, but we did not do that for
     # get_stock_prices, because it was defined traditionally
-    is_api_available() >> get_stock_prices
+    is_api_available() >> get_stock_prices >> store_prices
 
 
 stock_market()
