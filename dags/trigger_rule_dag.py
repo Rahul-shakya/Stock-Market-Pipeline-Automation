@@ -12,12 +12,12 @@ default_args = {
 }
 
 def download_website_a():
-    # print("download_website_a")
-    raise ValueError("error")
+    print("download_website_a")
+    # raise ValueError("error")
 
 def download_website_b():
-    # print("download_website_b")
-    raise ValueError("error")
+    print("download_website_b")
+    # raise ValueError("error")
 
 def download_failed():
     print("download_failed")
@@ -28,8 +28,8 @@ def download_succeed():
     #raise ValueError("error")
 
 def process():
-    # print("process")
-    raise ValueError("error")
+    print("process")
+    # raise ValueError("error")
 
 def notif_a():
     print("notif_a")
@@ -73,6 +73,7 @@ with DAG(dag_id='trigger_rule_dag',
 
     download_succeed_task = PythonOperator(
         task_id='download_succeed',
+        depends_on_past = True,
         python_callable=download_succeed,
         trigger_rule="all_success"
     )
